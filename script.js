@@ -23,33 +23,6 @@ document.querySelectorAll(".sidebar a").forEach(link => {
     });
 
 });
-/* ===========================
-   Animate Skills on Scroll
-=========================== */
-
-const skillSection = document.querySelector("#skills");
-
-const progressBars = document.querySelectorAll(".progress");
-
-const observer = new IntersectionObserver((entries)=>{
-
-    entries.forEach(entry=>{
-
-        if(entry.isIntersecting){
-
-            progressBars.forEach(bar=>{
-
-                bar.style.animation = "fillBar 2s ease forwards";
-
-            });
-
-        }
-
-    });
-
-},{threshold:0.4});
-
-observer.observe(skillSection);
 
 /*=================================
         EDUCATION CAROUSEL
