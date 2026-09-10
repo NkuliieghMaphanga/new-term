@@ -1,36 +1,30 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    initSmoothScrolling();
+    /*==============================================
+        SMOOTH SCROLL
+    ==============================================*/
 
-    initScrollReveal();
+    const navLinks = document.querySelectorAll(".sidebar a");
 
-    initActiveSidebar();
+    navLinks.forEach(link => {
 
-    initBackToTop();
+        link.addEventListener("click", function (e) {
 
-    initGalleryLightbox();
+            const href = this.getAttribute("href");
 
-});
-
-
-function initSmoothScrolling(){
-
-    const links = document.querySelectorAll('a[href^="#"]');
-
-    links.forEach(link => {
-
-        link.addEventListener("click", function(e){
-
-            const target = document.querySelector(this.getAttribute("href"));
-
-            if(!target) return;
+            if (!href.startsWith("#")) return;
 
             e.preventDefault();
 
-            target.scrollIntoView({
+            const section = document.querySelector(href);
 
-                behavior:"smooth",
-                block:"start"
+            if (!section) return;
+
+            window.scrollTo({
+
+                top: section.offsetTop - 30,
+
+                behavior: "smooth"
 
             });
 
@@ -38,55 +32,24 @@ function initSmoothScrolling(){
 
     });
 
-}
-
-function initScrollReveal(){
-
-    const cards = document.querySelectorAll(".card");
-
-    const observer = new IntersectionObserver((entries)=>{
-
-        entries.forEach(entry=>{
-
-            if(entry.isIntersecting){
-
-                entry.target.classList.add("show");
-
-            }
-
-        });
-
-    },{
-
-        threshold:.15
-
-    });
-
-    cards.forEach(card=>{
-
-        card.classList.add("fade-up");
-
-        observer.observe(card);
-
-    });
-
-}
-
-function initActiveSidebar(){
+    /*==============================================
+        ACTIVE NAVIGATION
+    ==============================================*/
 
     const sections = document.querySelectorAll("section");
 
-    const navLinks = document.querySelectorAll(".sidebar a");
-
-    window.addEventListener("scroll",()=>{
+    function highlightNavigation() {
 
         let current = "";
 
-        sections.forEach(section=>{
+        sections.forEach(section => {
 
-            const sectionTop = section.offsetTop - 150;
+            const top = section.offsetTop - 150;
 
-            if(pageYOffset >= sectionTop){
+            const height = section.offsetHeight;
+
+            if (window.scrollY >= top &&
+                window.scrollY < top + height) {
 
                 current = section.getAttribute("id");
 
@@ -94,11 +57,11 @@ function initActiveSidebar(){
 
         });
 
-        navLinks.forEach(link=>{
+        navLinks.forEach(link => {
 
             link.classList.remove("active");
 
-            if(link.getAttribute("href")==="#" + current){
+            if (link.getAttribute("href") === "#" + current) {
 
                 link.classList.add("active");
 
@@ -106,124 +69,67 @@ function initActiveSidebar(){
 
         });
 
-    });
+    }
 
-}
+    window.addEventListener("scroll", highlightNavigation);
 
+    highlightNavigation();
 
-function initBackToTop(){
+    /*==============================================
+        SCROLL TO TOP BUTTON
+    ==============================================*/
 
-    const button = document.createElement("button");
+    const scrollBtn = document.getElementById("scrollTopBtn");
 
-    button.className = "back-to-top";
+    function toggleScrollButton() {
 
-    button.innerHTML =
+        if (!scrollBtn) return;
 
-    '<i class="fas fa-arrow-up"></i>';
+        if (window.scrollY > 400) {
 
-    document.body.appendChild(button);
+            scrollBtn.style.display = "flex";
 
-    window.addEventListener("scroll",()=>{
+        } else {
 
-        if(window.scrollY > 500){
-
-            button.classList.add("show");
-
-        }
-
-        else{
-
-            button.classList.remove("show");
+            scrollBtn.style.display = "none";
 
         }
-
-    });
-
-    button.addEventListener("click",()=>{
-
-        window.scrollTo({
-
-            top:0,
-
-            behavior:"smooth"
-
-        });
-
-    });
-
-}
-
-function initGalleryLightbox(){
-
-    const images = document.querySelectorAll(".gallery-grid img");
-
-    if(images.length === 0) return;
-
-    let currentImage = 0;
-
-    const lightbox = document.createElement("div");
-    lightbox.className = "lightbox";
-
-    lightbox.innerHTML = `
-
-        <span class="lightbox-close">&times;</span>
-
-        <button class="lightbox-prev">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-
-        <img src="" alt="Project Screenshot">
-
-        <button class="lightbox-next">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-
-        <div class="lightbox-counter"></div>
-
-    `;
-
-    document.body.appendChild(lightbox);
-
-    const lightboxImage = lightbox.querySelector("img");
-
-    const closeButton = lightbox.querySelector(".lightbox-close");
-
-    const previousButton = lightbox.querySelector(".lightbox-prev");
-
-    const nextButton = lightbox.querySelector(".lightbox-next");
-
-    const counter = lightbox.querySelector(".lightbox-counter");
-
-    function updateImage(index){
-
-        currentImage = index;
-
-        lightboxImage.src = images[currentImage].src;
-
-        lightboxImage.alt = images[currentImage].alt;
-
-        counter.textContent =
-            `${currentImage + 1} / ${images.length}`;
 
     }
 
-    images.forEach((image,index)=>{
+    window.addEventListener("scroll", toggleScrollButton);
 
-        image.addEventListener("click",()=>{
+    toggleScrollButton();
 
-            lightbox.classList.add("active");
+    if (scrollBtn) {
 
-            document.body.style.overflow = "hidden";
+        scrollBtn.addEventListener("click", () => {
 
-            updateImage(index);
+            window.scrollTo({
+
+                top: 0,
+
+                behavior: "smooth"
+
+            });
 
         });
 
-    });
+    }
 
-    closeButton.addEventListener("click",closeLightbox);
+});
 
-    function closeLightbox(){
+/*==============================================
+    KEYBOARD SUPPORT
+==============================================*/
+
+document.addEventListener("keydown", (event) => {
+
+    const lightbox = document.querySelector(".lightbox");
+
+    if (!lightbox) return;
+
+    if (event.key === "Escape") {
 
         lightbox.classList.remove("active");
 
@@ -231,326 +137,86 @@ function initGalleryLightbox(){
 
     }
 
-    previousButton.addEventListener("click",()=>{
+});
 
-        currentImage--;
+/*==============================================
+    REFRESH ACTIVE NAVIGATION
+==============================================*/
 
-        if(currentImage < 0){
+window.addEventListener("load", () => {
 
-            currentImage = images.length - 1;
+    const event = new Event("scroll");
 
-        }
-
-        updateImage(currentImage);
-
-    });
-
-    nextButton.addEventListener("click",()=>{
-
-        currentImage++;
-
-        if(currentImage >= images.length){
-
-            currentImage = 0;
-
-        }
-
-        updateImage(currentImage);
-
-    });
-
-    lightbox.addEventListener("click",(event)=>{
-
-        if(event.target === lightbox){
-
-            closeLightbox();
-
-        }
-
-    });
-
-    document.addEventListener("keydown",(event)=>{
-
-        if(!lightbox.classList.contains("active")) return;
-
-        switch(event.key){
-
-            case "Escape":
-
-                closeLightbox();
-
-                break;
-
-            case "ArrowLeft":
-
-                previousButton.click();
-
-                break;
-
-            case "ArrowRight":
-
-                nextButton.click();
-
-                break;
-
-        }
-
-    });
-
-}
-
-/*==========================================
-    Gallery Hover Animation
-==========================================*/
-
-const galleryImages = document.querySelectorAll(".gallery-grid img");
-
-galleryImages.forEach(image=>{
-
-    image.addEventListener("mouseenter",()=>{
-
-        image.style.transform = "scale(1.05)";
-
-    });
-
-    image.addEventListener("mouseleave",()=>{
-
-        image.style.transform = "scale(1)";
-
-    });
+    window.dispatchEvent(event);
 
 });
 
-const lazyImages = document.querySelectorAll("img");
+window.addEventListener("resize", () => {
 
-const lazyObserver = new IntersectionObserver((entries)=>{
+    const event = new Event("scroll");
 
-    entries.forEach(entry=>{
-
-        if(entry.isIntersecting){
-
-            entry.target.classList.add("loaded");
-
-        }
-
-    });
+    window.dispatchEvent(event);
 
 });
 
-lazyImages.forEach(image=>{
+/*==============================================
+    ACCESSIBILITY
+==============================================*/
 
-    lazyObserver.observe(image);
+const allButtons = document.querySelectorAll(
 
-});
+    ".btn, .btn-outline, .sidebar a"
 
-const heroButtons = document.querySelectorAll(".btn, .btn-outline");
-
-heroButtons.forEach(button=>{
-
-    button.addEventListener("mouseenter",()=>{
-
-        button.style.transform = "translateY(-4px)";
-
-    });
-
-    button.addEventListener("mouseleave",()=>{
-
-        button.style.transform = "translateY(0)";
-
-    });
-
-});
-
-const cards = document.querySelectorAll(".project-card, .info-card");
-
-cards.forEach(card=>{
-
-    card.addEventListener("mouseenter",()=>{
-
-        card.style.transition = ".3s";
-
-    });
-
-});
-
-const sections = document.querySelectorAll("section");
-
-const sectionObserver = new IntersectionObserver((entries)=>{
-
-    entries.forEach(entry=>{
-
-        if(entry.isIntersecting){
-
-            entry.target.classList.add("show");
-
-        }
-
-    });
-
-},{
-    threshold:.2
-});
-
-sections.forEach(section=>{
-
-    sectionObserver.observe(section);
-
-});
-
-function animateCounters(){
-
-    const counters = document.querySelectorAll("[data-count]");
-
-    if(counters.length === 0) return;
-
-    const observer = new IntersectionObserver((entries)=>{
-
-        entries.forEach(entry=>{
-
-            if(!entry.isIntersecting) return;
-
-            const counter = entry.target;
-
-            const target = Number(counter.dataset.count);
-
-            let current = 0;
-
-            const increment = Math.max(1, Math.ceil(target / 80));
-
-            const timer = setInterval(()=>{
-
-                current += increment;
-
-                if(current >= target){
-
-                    current = target;
-
-                    clearInterval(timer);
-
-                }
-
-                counter.textContent = current;
-
-            },20);
-
-            observer.unobserve(counter);
-
-        });
-
-    },{
-
-        threshold:0.6
-
-    });
-
-    counters.forEach(counter=>observer.observe(counter));
-
-}
-
-animateCounters();
-
-const progressBar = document.createElement("div");
-
-progressBar.className = "reading-progress";
-
-document.body.appendChild(progressBar);
-
-window.addEventListener("scroll",()=>{
-
-    const scrollTop = document.documentElement.scrollTop;
-
-    const pageHeight =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
-
-    const progress = (scrollTop / pageHeight) * 100;
-
-    progressBar.style.width = progress + "%";
-
-});
-
-
-const heroTitle = document.querySelector(".hero h1");
-
-if(heroTitle){
-
-    const text = heroTitle.textContent;
-
-    heroTitle.textContent = "";
-
-    let i = 0;
-
-    function typeWriter(){
-
-        if(i < text.length){
-
-            heroTitle.textContent += text.charAt(i);
-
-            i++;
-
-            setTimeout(typeWriter,50);
-
-        }
-
-    }
-
-    typeWriter();
-
-}
-
-/*==========================================
-    Navbar Shadow
-==========================================*/
-
-window.addEventListener("scroll",()=>{
-
-    const sidebar = document.querySelector(".sidebar");
-
-    if(!sidebar) return;
-
-    if(window.scrollY > 120){
-
-        sidebar.style.boxShadow =
-            "0 0 30px rgba(0,191,255,.55)";
-
-    }
-
-    else{
-
-        sidebar.style.boxShadow =
-            "0 0 20px rgba(0,191,255,.35)";
-
-    }
-
-});
-
-/*==========================================
-    Current Year
-==========================================*/
-
-const year = document.querySelector(".current-year");
-
-if(year){
-
-    year.textContent = new Date().getFullYear();
-
-}
-
-/*==========================================
-    Console Message
-==========================================*/
-
-console.log(
-"%cPortfolio Case Study Loaded Successfully",
-"color:#00bfff;font-size:18px;font-weight:bold;"
 );
 
-/*==========================================
-    Performance Optimization
-==========================================*/
+allButtons.forEach(button => {
 
-window.addEventListener("load",()=>{
+    button.addEventListener("focus", () => {
 
-    document.body.classList.add("loaded");
+        button.style.outline = "2px solid #00bfff";
 
-})
+        button.style.outlineOffset = "4px";
+
+    });
+
+    button.addEventListener("blur", () => {
+
+        button.style.outline = "none";
+
+    });
+
+});
+
+/*==============================================
+    IMAGE PRELOADING
+==============================================*/
+
+const projectImages = document.querySelectorAll(".project-image");
+
+projectImages.forEach(image => {
+
+    const preload = new Image();
+
+    preload.src = image.src;
+
+});
+
+/*==============================================
+    CONSOLE MESSAGE
+==============================================*/
+
+console.log("%cAir BnB Clone Case Study Loaded Successfully!",
+
+    "color:#00bfff;font-size:16px;font-weight:bold;"
+
+);
+
+console.log("%cDesigned & Developed by Nonkululeko Mphoentle Maphanga",
+
+    "color:white;font-size:13px;"
+
+);
+
+/*==============================================
+    END OF CASE STUDY JAVASCRIPT
+==============================================*/
