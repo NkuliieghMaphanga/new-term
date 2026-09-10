@@ -205,7 +205,7 @@ projectImages.forEach(image => {
     CONSOLE MESSAGE
 ==============================================*/
 
-console.log("%cAir BnB Clone Case Study Loaded Successfully!",
+console.log("%cWeather API Case Study Loaded Successfully!",
 
     "color:#00bfff;font-size:16px;font-weight:bold;"
 
@@ -216,7 +216,3 @@ console.log("%cDesigned & Developed by Nonkululeko Mphoentle Maphanga",
     "color:white;font-size:13px;"
 
 );
-
-/*==============================================
-    END OF CASE STUDY JAVASCRIPT
-==============================================*/
